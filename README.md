@@ -11,3 +11,13 @@ sudo pip install Flask --break-system-packages --ignore-installed
 cd ~/NGN
 sudo python3 demo.py
 ```
+
+1. Thuc hien migrate:
+- Thong bao cho partner
+- Dung server moi
+- Test
+- Force update client dieu huong sang ip server moi
+2. Thuc hien scale up:
+- Theo doi so luong request di vao nginx (prometheus)
+- Lay ips cac server dang hoat dong (eureka server/client)
+- Call Api trigger tao node moi, refresh nginx (hoac su dung spring cloud gateway)

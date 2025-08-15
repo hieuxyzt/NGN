@@ -15,8 +15,26 @@ net = containernetService.initContainernet()
 @app.route("/createServer", methods=['POST'])
 def createServer():
     data = request.get_json()
-    info("Clear request: ", data, "\n")
+    info("Clear request create server: ", data, "\n")
     containernetService.createServer(net, data["name"], data["ip"])
+    return "ok"
+
+@app.route("/stopHost", methods=['POST'])
+def stopHost():
+    data = request.get_json()
+    info("Clear request stop host: ", data, "\n")
+    containernetService.stopHost(data["name"])
+    return "ok"
+
+@app.route("/addLink", methods=['POST'])
+def addLink():
+    data = request.get_json()
+    info("Clear request add link: ", data, "\n")
+    net.addLink(data["host"], data["switch"])
+    return "ok"
+
+@app.route("/updateNginx", methods=['POST'])
+def updateNginx():
     return "ok"
 
 
