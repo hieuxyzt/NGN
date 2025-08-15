@@ -5,6 +5,15 @@ from mininet.link import TCLink
 from mininet.log import info, setLogLevel
 
 
+def createServer(net, serverName, serverIp):
+    server = net.addDocker(serverName, ip=serverIp, dcmd="python app.py", dimage="server:latest")
+    return server
+
+def stopHost(net, hostName):
+    host = net.get(hostName)
+    host.terminate()
+    net.hosts.remove(host)
+
 def initContainernet():
     setLogLevel('info')
     net = Containernet(controller=Controller)
@@ -64,13 +73,5 @@ def initContainernet():
     info('Execute: client.cmd("time curl 10.0.0.1/hello/42")\n')
     info(client.cmd("time curl 10.0.0.1/hello/42") + "\n")
 
-    data = {
-        "net": net,
-        "client": client, 
-        "server": server, 
-        "server2": server2,
-        "server3": server3,
-        "lb": lb, 
-        "lb_backup": lb_backup
-    }
-    return data;
+    return net;
+

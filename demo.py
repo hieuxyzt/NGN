@@ -4,16 +4,23 @@ from mininet.log import info, setLogLevel
 from mininet.cli import CLI
 
 import time
-from flask import Flask
+from flask import Flask, request, jsonify
 import containernet_service as containernetService
 
 setLogLevel('info')
 app = Flask(__name__)
 
-data = containernetService.initContainernet()
+net = containernetService.initContainernet()
+
+@app.route("/createServer", methods=['POST'])
+def createServer():
+    data = request.get_json()
+    info("Clear request: ", data, "\n")
+    containernetService.createServer(net, data["name"], data["ip"])
+    return "ok"
+
 
 if __name__ == "__main__":
-    net = data["net"]
-    CLI(net)
-    net.stop()
+    # CLI(net)
     app.run(host='0.0.0.0', port=1234)
+    net.stop()
