@@ -4,13 +4,9 @@ server:
 spring:
   application:
     name: api-gateway
+  main:
+    web-application-type: reactive
   cloud:
-#    discovery:
-#      client:
-#        simple:
-#          instances:
-#            server:
-#              - uri: http://10.0.1.1:80
     gateway:
       server:
         webflux:
@@ -18,25 +14,9 @@ spring:
             - id: server
               uri: lb://server
               predicates:
-                - Path= server/**
-          httpclient:
-            pool:
-              metrics: true
-          default-filters:
-            - StripPrefix=1
-            - Metrics
-            - ModifyRequest
-            - ModifyResponse
-            - name: Retry
-              args:
-                methods: GET, POST
-                retries: 3
-                statuses: INTERNAL_SERVER_ERROR, SERVICE_UNAVAILABLE
-                backoff:
-                  firstBackoff: 5ms
-                  maxBackoff: 5ms
-          metrics:
-            enabled: true
+                - Path=/server/**
+              filters:
+                - StripPrefix=1
 
 eureka:
   client:
@@ -47,5 +27,7 @@ eureka:
 management:
   endpoints:
     web:
+      path-mapping:
+        health: healthcheck
       exposure:
-        include: info
+        include: '*'
