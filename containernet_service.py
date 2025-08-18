@@ -102,11 +102,11 @@ def initContainernet():
     info(lb_backup.cmd("nginx -t") + "\n")
     info(lb_backup.cmd("keepalived -t -f /etc/keepalived/keepalived.conf") + "\n")
 
-    info('Execute: client.cmd("time curl 10.0.0.1")\n')
-    info(client.cmd("time curl 10.0.0.1") + "\n")
+    #info('Execute: client.cmd("time curl 10.0.0.1")\n')
+    #info(client.cmd("time curl 10.0.0.1") + "\n")
 
-    info('Execute: client.cmd("time curl 10.0.0.1/hello/42")\n')
-    info(client.cmd("time curl 10.0.0.1/hello/42") + "\n")
+    #info('Execute: client.cmd("time curl 10.0.0.1/hello/42")\n')
+    #info(client.cmd("time curl 10.0.0.1/hello/42") + "\n")
 
     return net;
 
