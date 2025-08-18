@@ -62,11 +62,11 @@ def initContainernet():
     )
 
     info('*** Setup network\n')
-    sClient = net.addSwitch('sClient0')
-    sLb = net.addSwitch('sLb0')
-    sGateway = net.addSwitch('sGateway0')
-    sServer = net.addSwitch('sServer0')
-    sEureka = net.addSwitch('sEureka0')
+    sClient = net.addSwitch('s1')
+    sLb = net.addSwitch('s2')
+    sGateway = net.addSwitch('s3')
+    sServer = net.addSwitch('s4')
+    sEureka = net.addSwitch('s5')
 
     net.addLink(eureka,sEureka)
     net.addLink(client,sClient)
@@ -82,11 +82,11 @@ def initContainernet():
     net.addLink(server2,sServer)
     net.addLink(server3,sServer)
 
-    net.addLink(sClient, sLb, cls=TCLink, delay='10ms', bw=1)
-    net.addLink(sLb, sGateway, cls=TCLink, delay='1ms', bw=1)
-    net.addLink(sGateway, sServer, cls=TCLink, delay='1ms', bw=1)
-    net.addLink(sGateway, sServer, cls=TCLink, delay='1ms', bw=1)
-    net.addLink(sEureka, sLb, cls=TCLink, delay='1ms', bw=1)
+    net.addLink(sClient, sLb, cls=TCLink, delay='10ms', bw=2)
+    net.addLink(sLb, sGateway, cls=TCLink, delay='1ms', bw=2)
+    net.addLink(sGateway, sServer, cls=TCLink, delay='1ms', bw=2)
+    
+    net.addLink(sEureka, sServer, cls=TCLink, delay='1ms', bw=2)
 
     net.start()
 
@@ -102,8 +102,8 @@ def initContainernet():
     info(lb_backup.cmd("nginx -t") + "\n")
     info(lb_backup.cmd("keepalived -t -f /etc/keepalived/keepalived.conf") + "\n")
 
-    #info('Execute: client.cmd("time curl 10.0.0.1")\n')
-    #info(client.cmd("time curl 10.0.0.1") + "\n")
+    # info('Execute: client.cmd("time curl 10.0.0.1/server")\n')
+    # info(client.cmd("time curl 10.0.0.1/server") + "\n")
 
     #info('Execute: client.cmd("time curl 10.0.0.1/hello/42")\n')
     #info(client.cmd("time curl 10.0.0.1/hello/42") + "\n")

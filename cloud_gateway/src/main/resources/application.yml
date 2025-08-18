@@ -17,9 +17,9 @@ spring:
                 - Path=/server/**
               filters:
                 - StripPrefix=1
-
 eureka:
   client:
+    registry-fetch-interval-seconds: 3
     service-url:
         defaultZone: http://10.0.10.1:8761/eureka/
   instance:
