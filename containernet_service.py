@@ -11,7 +11,7 @@ def createServer(net, serverName, serverIp):
 
 def removeServer(net, serverName):
     server = net.get(serverName);
-    server.cmd("kill -9 `ps -ef | grep java | grep -v grep | awk '{print$2}'`");
+    server.cmd("kill `ps -ef | grep java | grep -v grep | awk '{print$2}'`");
 
 def initContainernet():
     setLogLevel('info')
