@@ -19,18 +19,11 @@ def createServer():
     containernetService.createServer(net, data["name"], data["ip"])
     return "ok"
 
-@app.route("/stopHost", methods=['POST'])
-def stopHost():
+@app.route("/removeServer", methods=['POST'])
+def removeServer():
     data = request.get_json()
-    info("Clear request stop host: ", data, "\n")
-    containernetService.stopHost(data["name"])
-    return "ok"
-
-@app.route("/addLink", methods=['POST'])
-def addLink():
-    data = request.get_json()
-    info("Clear request add link: ", data, "\n")
-    net.addLink(data["host"], data["switch"])
+    info("Clear request removeServer: ", data, "\n")
+    containernetService.removeServer(net, data["name"])
     return "ok"
 
 if __name__ == "__main__":
