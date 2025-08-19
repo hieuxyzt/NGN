@@ -19,3 +19,6 @@ docker build -t eureka -f Dockerfile .
 
 cd $ROOT/cloud_gateway
 docker build -t gateway -f Dockerfile .
+
+cd $ROOT/prometheus
+docker build -t my_prometheus -f Dockerfile .

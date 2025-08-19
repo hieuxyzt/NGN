@@ -19,94 +19,107 @@ def initContainernet():
     net = Containernet(controller=Controller)
     net.addController('c0')
 
-    info('*** Adding server and client container\n')
+    try:
+        info('*** Adding server and client container\n')
 
-    eureka = net.addDocker('eureka', ip='10.0.10.1', 
-        dcmd="nohup java -jar eureka_server.jar > info.log 2>&1&", 
-        dimage="eureka:latest",
-        publish_all_ports= True,
-        ports=[8761], port_bindings={8761:8761}
-    )
+        eureka = net.addDocker('eureka', ip='10.0.10.1', 
+            dcmd="nohup java -jar eureka_server.jar > info.log 2>&1&", 
+            dimage="eureka:latest",
+            publish_all_ports= True,
+            ports=[8761], port_bindings={8761:8761}
+        )
 
-    gateway = net.addDocker('gateway', ip='10.0.1.1', 
-        dcmd="nohup java -jar cloud_gateway.jar > info.log 2>&1&", 
-        dimage="gateway:latest")
-    gateway2 = net.addDocker('gateway2', ip='10.0.1.2', 
-        dcmd="nohup java -jar cloud_gateway.jar > info.log 2>&1&", 
-        dimage="gateway:latest")
-    gateway3 = net.addDocker('gateway3', ip='10.0.1.3', 
-        dcmd="nohup java -jar cloud_gateway.jar > info.log 2>&1&", 
-        dimage="gateway:latest")
+        prometheus = net.addDocker('p', ip='10.0.11.1', 
+            dimage="my_prometheus:latest",
+            publish_all_ports= True,
+            ports=[9090], port_bindings={9090:9090}
+        )
 
-    server = net.addDocker('server', ip='10.0.2.1', 
-        dcmd="nohup java -jar server.jar > info.log 2>&1&", 
-        dimage="server:latest")
-    server2 = net.addDocker('server2', ip='10.0.2.2',
-        dcmd="nohup java -jar server.jar > info.log 2>&1&", 
-        dimage="server:latest")
-    server3 = net.addDocker('server3', ip='10.0.2.3', 
-        dcmd="nohup java -jar server.jar > info.log 2>&1&", 
-        dimage="server:latest")
+        gateway = net.addDocker('gateway', ip='10.0.1.1', 
+            dcmd="nohup java -jar cloud_gateway.jar > info.log 2>&1&", 
+            dimage="gateway:latest")
+        gateway2 = net.addDocker('gateway2', ip='10.0.1.2', 
+            dcmd="nohup java -jar cloud_gateway.jar > info.log 2>&1&", 
+            dimage="gateway:latest")
+        gateway3 = net.addDocker('gateway3', ip='10.0.1.3', 
+            dcmd="nohup java -jar cloud_gateway.jar > info.log 2>&1&", 
+            dimage="gateway:latest")
 
-    client = net.addDocker('client', ip='10.0.20.1', dimage="client:latest")
-    lb = net.addDocker(
-        'lb', ip='10.0.0.2', dimage="nginx:latest", 
-        publish_all_ports= True,
-        ports=[80], port_bindings={80:80}
-    )
+        server = net.addDocker('server', ip='10.0.2.1', 
+            dcmd="nohup java -jar server.jar > info.log 2>&1&", 
+            dimage="server:latest")
+        server2 = net.addDocker('server2', ip='10.0.2.2',
+            dcmd="nohup java -jar server.jar > info.log 2>&1&", 
+            dimage="server:latest")
+        server3 = net.addDocker('server3', ip='10.0.2.3', 
+            dcmd="nohup java -jar server.jar > info.log 2>&1&", 
+            dimage="server:latest")
 
-    lb_backup = net.addDocker(
-        'lb_backup', ip='10.0.0.3', dimage="nginx_backup:latest", 
-        #publish_all_ports= True,
-        #ports=[80], port_bindings={81:80}
-    )
+        client = net.addDocker('client', ip='10.0.20.1', dimage="client:latest")
+        lb = net.addDocker(
+            'lb', ip='10.0.0.2', dimage="nginx:latest", 
+            publish_all_ports= True,
+            ports=[80], port_bindings={80:80}
+        )
 
-    info('*** Setup network\n')
-    sClient = net.addSwitch('s1')
-    sLb = net.addSwitch('s2')
-    sGateway = net.addSwitch('s3')
-    sServer = net.addSwitch('s4')
-    sEureka = net.addSwitch('s5')
+        lb_backup = net.addDocker(
+            'lb_backup', ip='10.0.0.3', dimage="nginx_backup:latest", 
+            #publish_all_ports= True,
+            #ports=[80], port_bindings={81:80}
+        )
 
-    net.addLink(eureka,sEureka)
-    net.addLink(client,sClient)
+        info('*** Setup network\n')
+        sClient = net.addSwitch('s1')
+        sLb = net.addSwitch('s2')
+        sGateway = net.addSwitch('s3')
+        sServer = net.addSwitch('s4')
+        sEureka = net.addSwitch('s5')
 
-    net.addLink(lb,sLb)
-    net.addLink(lb_backup,sLb)
+        net.addLink(eureka,sEureka)
+        net.addLink(prometheus,sEureka)
+        net.addLink(client,sClient)
 
-    net.addLink(gateway,sGateway)
-    net.addLink(gateway2,sGateway)
-    net.addLink(gateway3,sGateway)
+        net.addLink(lb,sLb)
+        net.addLink(lb_backup,sLb)
 
-    net.addLink(server,sServer)
-    net.addLink(server2,sServer)
-    net.addLink(server3,sServer)
+        net.addLink(gateway,sGateway)
+        net.addLink(gateway2,sGateway)
+        net.addLink(gateway3,sGateway)
 
-    net.addLink(sClient, sLb, cls=TCLink, delay='10ms', bw=2)
-    net.addLink(sLb, sGateway, cls=TCLink, delay='1ms', bw=2)
-    net.addLink(sGateway, sServer, cls=TCLink, delay='1ms', bw=2)
-    
-    net.addLink(sEureka, sServer, cls=TCLink, delay='1ms', bw=2)
+        net.addLink(server,sServer)
+        net.addLink(server2,sServer)
+        net.addLink(server3,sServer)
 
-    net.start()
 
-    info('*** Starting to execute commands\n')
+        net.addLink(sClient, sLb, cls=TCLink, delay='10ms', bw=1)
+        net.addLink(sLb, sGateway, cls=TCLink, delay='1ms', bw=1)
+        net.addLink(sGateway, sServer, cls=TCLink, delay='1ms', bw=1)
+        
+        net.addLink(sEureka, sServer, cls=TCLink, delay='1ms', bw=1)
 
-    info('set up master nginx')
-    lb.cmd("service keepalived start -D && nginx")
-    info(lb.cmd("nginx -t") + "\n")
-    info(lb.cmd("keepalived -t -f /etc/keepalived/keepalived.conf") + "\n")
+        net.start()
 
-    info('set up backup nginx')
-    lb_backup.cmd("service keepalived start -D && nginx")
-    info(lb_backup.cmd("nginx -t") + "\n")
-    info(lb_backup.cmd("keepalived -t -f /etc/keepalived/keepalived.conf") + "\n")
+        info('*** Starting to execute commands\n')
 
-    # info('Execute: client.cmd("time curl 10.0.0.1/server")\n')
-    # info(client.cmd("time curl 10.0.0.1/server") + "\n")
+        info('set up master nginx')
+        lb.cmd("service keepalived start -D && nginx")
+        info(lb.cmd("nginx -t") + "\n")
+        info(lb.cmd("keepalived -t -f /etc/keepalived/keepalived.conf") + "\n")
 
-    #info('Execute: client.cmd("time curl 10.0.0.1/hello/42")\n')
-    #info(client.cmd("time curl 10.0.0.1/hello/42") + "\n")
+        info('set up backup nginx')
+        lb_backup.cmd("service keepalived start -D && nginx")
+        info(lb_backup.cmd("nginx -t") + "\n")
+        info(lb_backup.cmd("keepalived -t -f /etc/keepalived/keepalived.conf") + "\n")
 
-    return net;
+        info('set up prometheus')
+        prometheus.cmd("nohup ./prometheus --config.file=prometheus.yml > info.log 2>&1&")
+        # info('Execute: client.cmd("time curl 10.0.0.1/server")\n')
+        # info(client.cmd("time curl 10.0.0.1/server") + "\n")
 
+        #info('Execute: client.cmd("time curl 10.0.0.1/hello/42")\n')
+        #info(client.cmd("time curl 10.0.0.1/hello/42") + "\n")
+        
+    except Exception as e:
+        info("Error setup containernet!!!!!\n", e)
+    finally:
+        return net;

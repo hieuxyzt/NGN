@@ -33,11 +33,6 @@ def addLink():
     net.addLink(data["host"], data["switch"])
     return "ok"
 
-@app.route("/updateNginx", methods=['POST'])
-def updateNginx():
-    return "ok"
-
-
 if __name__ == "__main__":
     # CLI(net)
     app.run(host='0.0.0.0', port=1234)
