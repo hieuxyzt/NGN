@@ -19,6 +19,7 @@
         <module>server</module>
         <module>eureka_server</module>
         <module>cloud_gateway</module>
+        <module>scaling_server</module>
     </modules>
     <properties>
         <java.version>21</java.version>

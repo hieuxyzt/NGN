@@ -1,7 +1,7 @@
 package ngn;
 
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -10,8 +10,9 @@ public class ServerController {
     private String home() {
         return "Hello World";
     }
-    @GetMapping("/hello/{id}")
-    private String hello(@PathVariable String id) {
-        return "Hello " + (id + 1);
+
+    @PostMapping("/")
+    private String hello() {
+        return "Hello World";
     }
 }

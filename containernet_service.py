@@ -114,11 +114,8 @@ def initContainernet():
         info('set up prometheus')
         prometheus.cmd("nohup ./prometheus --config.file=prometheus.yml > info.log 2>&1&")
         # info('Execute: client.cmd("time curl 10.0.0.1/server")\n')
-        # info(client.cmd("time curl 10.0.0.1/server") + "\n")
+        # info(client.cmd("time curl -X POST 10.0.0.1/server") + "\n")
 
-        #info('Execute: client.cmd("time curl 10.0.0.1/hello/42")\n')
-        #info(client.cmd("time curl 10.0.0.1/hello/42") + "\n")
-        
     except Exception as e:
         info("Error setup containernet!!!!!\n", e)
     finally:
