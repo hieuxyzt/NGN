@@ -28,7 +28,8 @@ public class ScalingService {
     public long getRequestPerSecond() {
         long requestPerSecond = 0;
 
-        String query = "rate(http_client_requests_seconds_count{method='POST'}[2m])";
+        // String query = "rate(http_client_requests_seconds_count{http_method='POST'}[2m])";
+        String query = "increase(http_client_requests_seconds_count{http_method='POST'}[5m])";
         JsonNode result = queryPrometheus(query);
         log.info("Clear Result: {}", result.toString());
         for(JsonNode node : result) {
