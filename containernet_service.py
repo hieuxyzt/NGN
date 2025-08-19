@@ -5,9 +5,9 @@ from mininet.link import TCLink
 from mininet.log import info, setLogLevel
 
 
-def createServer(net, serverName, serverIp):
+def createServer(net, serverName):
     server = net.get(serverName);
-    server.cmd("nohup java -jar server.jar > info.log 2>&1&");
+    server.cmd("nohup java -Xms100m -Xmx100m -jar server.jar > info.log 2>&1&");
 
 def removeServer(net, serverName):
     server = net.get(serverName);
@@ -31,7 +31,7 @@ def initContainernet():
         info('*** Adding server and client container\n')
 
         eureka = net.addDocker('eureka', ip='10.0.10.1', 
-            dcmd="nohup java -jar eureka_server.jar > info.log 2>&1&", 
+            dcmd="nohup java -Xms100m -Xmx100m -jar eureka_server.jar > info.log 2>&1&", 
             dimage="eureka:latest",
             publish_all_ports= True,
             ports=[8761], port_bindings={8761:8761}
@@ -43,17 +43,22 @@ def initContainernet():
             ports=[9090], port_bindings={9090:9090}
         )
 
+        scalingServer = net.addDocker('scaling', ip='10.0.12.1', 
+            dcmd="nohup java -Xms100m -Xmx100m -jar scaling_server.jar > info.log 2>&1&", 
+            dimage="scaling_server:latest",
+        )
+
         gateway = net.addDocker('gateway', ip='10.0.1.1', 
-            dcmd="nohup java -jar cloud_gateway.jar > info.log 2>&1&", 
+            dcmd="nohup java -Xms100m -Xmx100m -jar cloud_gateway.jar > info.log 2>&1&", 
             dimage="gateway:latest")
         gateway2 = net.addDocker('gateway2', ip='10.0.1.2', 
-            dcmd="nohup java -jar cloud_gateway.jar > info.log 2>&1&", 
+            dcmd="nohup java -Xms100m -Xmx100m -jar cloud_gateway.jar > info.log 2>&1&", 
             dimage="gateway:latest")
         gateway3 = net.addDocker('gateway3', ip='10.0.1.3', 
-            dcmd="nohup java -jar cloud_gateway.jar > info.log 2>&1&", 
+            dcmd="nohup java -Xms100m -Xmx100m -jar cloud_gateway.jar > info.log 2>&1&", 
             dimage="gateway:latest")
 
-        numOfServer = 20;
+        numOfServer = 10;
         for i in range(1, numOfServer + 1):
             server = net.addDocker('server' + str(i), ip='10.0.2.' + str(i), 
                 #dcmd="nohup java -jar server.jar > info.log 2>&1&", 
@@ -82,6 +87,7 @@ def initContainernet():
 
         net.addLink(eureka,sEureka)
         net.addLink(prometheus,sEureka)
+        net.addLink(scalingServer, sEureka)
         net.addLink(client,sClient)
 
         net.addLink(lb,sLb)
@@ -96,12 +102,12 @@ def initContainernet():
         net.addLink(sLb, sGateway, cls=TCLink, delay='1ms', bw=1)
         net.addLink(sGateway, sServer, cls=TCLink, delay='1ms', bw=1)
         net.addLink(sEureka, sServer, cls=TCLink, delay='1ms', bw=1)
-        net.addLink(sServerOld, sServer, cls=TCLink, delay='50ms', bw=1)
+        net.addLink(sGateway, sServerOld, cls=TCLink, delay='300ms', bw=1)
 
         net.start()
 
         info('*** Starting to execute commands\n')
-        serverOld.cmd("nohup java -jar server.jar > info.log 2>&1&")
+        serverOld.cmd("nohup java -Xms100m -Xmx100m -jar server.jar > info.log 2>&1&")
 
         info('set up master nginx')
         lb.cmd("service keepalived start -D && nginx")

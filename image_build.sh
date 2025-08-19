@@ -22,3 +22,6 @@ docker build -t gateway -f Dockerfile .
 
 cd $ROOT/prometheus
 docker build -t my_prometheus -f Dockerfile .
+
+cd $ROOT/scaling_server
+docker build -t scaling_server -f Dockerfile .

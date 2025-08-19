@@ -2,6 +2,9 @@ package ngn;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -15,7 +18,7 @@ public class ScalingService {
     private final String createServerUrl = "http://172.17.0.1:1234/createServer";
     private final String removeServerUrl = "http://172.17.0.1:1234/removeServer";
     private final long start = 2;
-    private final long max = 20;
+    private final long max = 10;
     long current = 2;
 
 
@@ -40,7 +43,7 @@ public class ScalingService {
     }
 
     public JsonNode queryPrometheus(String query) {
-        String prometheusUrl = "http://localhost:9090/api/v1/query";
+        String prometheusUrl = "http://10.0.11.1:9090/api/v1/query";
         String url = prometheusUrl + "?query=" + query;
         Request request = new Request.Builder()
                 .url(UriComponentsBuilder.fromUriString(url).toUriString())
@@ -59,6 +62,7 @@ public class ScalingService {
 
     public void manageServers(long requestPerSecond) {
         long instances = start + requestPerSecond / 1000;
+        log.info("Current {}, update to: {}", current, instances);
         if(instances > max) instances = max;
 
         if(instances > current) {
@@ -75,24 +79,33 @@ public class ScalingService {
     }
 
     public void removeServer(String name, String ip) {
-        manageServer(removeServerUrl);
+        manageServer(removeServerUrl, name, ip);
     }
 
     public void createServer(String name, String ip) {
-        manageServer(createServerUrl);
+        manageServer(createServerUrl, name, ip);
     }
 
-    public void manageServer(String url) {
+    @Data
+    public static class DataBody {
+        private String name;
+        private String ip;
+    }
+
+    public void manageServer(String url, String name, String ip) {
+        Gson gson = new Gson();
         MediaType mediaType = MediaType.parse("application/json");
-        RequestBody body = RequestBody.create(mediaType, "");
+        DataBody dataBody = new DataBody();
+        dataBody.setName(name);
+        RequestBody body = RequestBody.create(mediaType, gson.toJson(dataBody));
         Request request = new Request.Builder()
-                .url(createServerUrl)
+                .url(url)
                 .method("POST", body)
                 .build();
 
         try (Response response = okHttpClient.newCall(request).execute()){
             String jsonResponse = response.body().string();
-            log.info("Create server response: {}", jsonResponse);
+            log.info("Call {} response: {}", url, jsonResponse);
         } catch (Exception e) {
             throw new RuntimeException("Error parsing Prometheus response", e);
         }

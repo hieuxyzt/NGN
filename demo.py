@@ -16,13 +16,13 @@ net = containernetService.initContainernet()
 def createServer():
     data = request.get_json()
     info("Clear request create server: ", data, "\n")
-    containernetService.createServer(net, data["name"], data["ip"])
+    containernetService.createServer(net, data["name"])
     return "ok"
 
 @app.route("/removeServer", methods=['POST'])
 def removeServer():
     data = request.get_json()
-    info("Clear request removeServer: ", data, "\n")
+    info("Clear request remove server: ", data, "\n")
     containernetService.removeServer(net, data["name"])
     return "ok"
 
