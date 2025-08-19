@@ -1,5 +1,5 @@
 server:
-  port: 80
+  port: 8081
 spring:
   application:
     name: scaling_server
@@ -7,7 +7,7 @@ eureka:
   client:
     registry-fetch-interval-seconds: 3
     service-url:
-        defaultZone: http://10.0.10.1:8761/eureka/
+        defaultZone: http://localhost:8761/eureka/
   instance:
     preferIpAddress: true
 management:
