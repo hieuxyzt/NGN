@@ -13,6 +13,7 @@ docker build -t nginx_backup -f Dockerfile.nginx .
 
 cd $ROOT/server
 docker build -t server -f Dockerfile .
+docker build -t server_old -f Dockerfile .
 
 cd $ROOT/eureka_server
 docker build -t eureka -f Dockerfile .

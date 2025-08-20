@@ -22,7 +22,7 @@ public class ScalingService {
     long current = 2;
 
 
-    @Scheduled(fixedDelayString = "60000", initialDelay = 0)
+    @Scheduled(fixedDelayString = "30000", initialDelay = 0)
     public void scaleUp() {
         long requestPerSecond = getRequestPerSecond();
         manageServers(requestPerSecond);
@@ -32,7 +32,7 @@ public class ScalingService {
         long requestPerSecond = 0;
 
         // String query = "rate(http_client_requests_seconds_count{http_method='POST'}[2m])";
-        String query = "increase(http_client_requests_seconds_count{http_method='POST'}[5m])";
+        String query = "increase(http_client_requests_seconds_count{http_method='POST'}[3m])";
         JsonNode result = queryPrometheus(query);
         log.info("Clear Result: {}", result.toString());
         for(JsonNode node : result) {
@@ -62,7 +62,7 @@ public class ScalingService {
 
     public void manageServers(long requestPerSecond) {
         long instances = start + requestPerSecond / 1000;
-        log.info("Current {}, update to: {}", current, instances);
+        log.info("Current {}, update to: {}", current - 1, instances - 1);
         if(instances > max) instances = max;
 
         if(instances > current) {
@@ -71,7 +71,7 @@ public class ScalingService {
             }
         }
         if(instances < current) {
-            for(long i = instances; i < current; i++) {
+            for(long i = current - 1; i >= instances; i--) {
                 removeServer("server" + i, "10.0.2." + i);
             }
         }

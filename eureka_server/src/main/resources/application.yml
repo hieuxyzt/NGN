@@ -10,9 +10,7 @@ server:
 eureka:
   instance:
     preferIpAddress: true
-    lease-renewal-interval-in-seconds: 10
-  # server:
-    # enable-self-preservation: false
+    leaseRenewalIntervalInSeconds: 3
 logging:
   level:
     com.netflix.eureka: OFF

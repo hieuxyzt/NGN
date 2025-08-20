@@ -67,7 +67,7 @@ def initContainernet():
         
         serverOld = net.addDocker('serverOld', ip='10.0.100.1', 
                 #dcmd="nohup java -jar server.jar > info.log 2>&1&", 
-                dimage="server:latest")
+                dimage="server_old:latest")
         net.addLink(serverOld, sServerOld)
 
         client = net.addDocker('client', ip='10.0.20.1', dimage="client:latest")
@@ -102,7 +102,7 @@ def initContainernet():
         net.addLink(sLb, sGateway, cls=TCLink, delay='1ms', bw=1)
         net.addLink(sGateway, sServer, cls=TCLink, delay='1ms', bw=1)
         net.addLink(sEureka, sServer, cls=TCLink, delay='1ms', bw=1)
-        net.addLink(sGateway, sServerOld, cls=TCLink, delay='300ms', bw=1)
+        net.addLink(sGateway, sServerOld, cls=TCLink, delay='50ms', bw=1)
 
         net.start()
 
